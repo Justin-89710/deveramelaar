@@ -1,7 +1,8 @@
 <?php
+// start session
 session_start();
 
-// get session info
+// get id from session
 $id = $_SESSION['id'];
 
 // connect to database
@@ -16,13 +17,12 @@ if (!$db) {
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
+// check if user is logged in and set all the session variables
 if (!isset($_SESSION['loggedin'])) {
-    $sessionname = "Bezoeker";
-    $sessionemail = null;
-    $sessionprofielfoto = "default.png";
-    $sessionbio = "Ik ben een bezoeker!";
-    $sessionrank = null;
+    // send user to login page
+    header("location: ../home/home.php");
 } elseif (isset($_SESSION['loggedin'])) {
+    //if logged in
     $sesionid = $_SESSION['id'];
     $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
     $row = $result->fetchArray();
@@ -32,27 +32,26 @@ if (!isset($_SESSION['loggedin'])) {
     $sessionbio = $row['bio'];
     $sessionrank = $row['rank'];
 } else {
+    //if there is something wrong
     $error = "Error";
 }
 
-// ceck if user is logged in
-if (!isset($_SESSION['loggedin'])) {
-    $sessionrank = null;
-} else {
-    $sessionrank = $_SESSION['rank'];
-}
-
-// change rank into text
+// change session rank into text
 if ($sessionrank == 0) {
-    $sessionrank = "User";
+    //if rank is 0
+    $sessionrank = "Verzamelaar";
 } elseif ($sessionrank == 1) {
+    //if rank is 1
     $sessionrank = "Admin";
 } elseif ($sessionrank == null) {
+    //if rank is not set
     $sessionrank = "Bezoeker";
 } else {
+    //if rank is none of the above
     $sessionrank = "Error";
 }
-//get info from database
+
+//get info for the account page from database
 $result = $db->query("SELECT * FROM Login WHERE ID='$id'");
 $row = $result->fetchArray();
 $username = $row['username'];
@@ -64,16 +63,17 @@ $post = $row['posts'];
 
 // change rank into text
 if ($rank == 0) {
+    //if rank is 0
     $rank = "Verzamelaar";
 } elseif ($rank == 1) {
+    //if rank is 1
     $rank = "Admin";
 } else {
+    //if rank is none of the above
     $rank = "Error";
 }
 
-// get al users posts
-$result = $db->query("SELECT * FROM Posts WHERE userID='$id' ORDER BY ID DESC LIMIT 4");
-
+// search function
 $searchresult = null;
 if (isset($_POST['searchbutton'])) {
     $search = $_POST['searchinput'];
@@ -90,15 +90,21 @@ if (isset($_POST['searchbutton'])) {
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo $username?> account</title>
+    <!-- Icon for web -->
     <link rel="icon" href="../afbeeldingen/logo.png">
+    <!-- Nav style sheet -->
     <link rel="stylesheet" href="../nav/nav.css">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
+<!-- section for the page -->
 <section class="h-100 gradient-custom-2" style="min-height: 100vh">
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1f2029;">
+    <!-- Nav -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(145,145,145,0.5);">
         <div class="container-fluid">
             <a class="navbar-brand" href="../home/home.php">
+                <!-- logo -->
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,13 +119,13 @@ if (isset($_POST['searchbutton'])) {
                         <a class="nav-link" href="../askadmin.php">Ask The Admin</a>
                     </li>
                 </ul>
+                <!-- Search form -->
                 <form method="post" class="d-flex">
                     <input type="text" class="form-control me-2" name="searchinput" placeholder="Search">
                     <button type="submit" class="btn btn-outline-light" name="searchbutton">Search</button>
                 </form>
-                <br>
                 <!-- Search Results -->
-                <div class="search-results">
+                <div class="search-results" style="background-color: rgba(145,145,145,0.5);">
                     <div class="container">
                         <?php
                         if ($searchresult !== null) {
@@ -129,7 +135,7 @@ if (isset($_POST['searchbutton'])) {
                                 $searchid = $searchrow['ID'];
                                 ?>
                                 <div class="profile-item">
-                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
+                                    <a class="hover" href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
                                         <img src="../afbeeldingen/<?php echo $searchprofilepic ?>" alt="Profile Picture" class="profile-picture">
                                         <?php echo $searchname ?></a>
                                 </div>
@@ -141,8 +147,11 @@ if (isset($_POST['searchbutton'])) {
                 </div>
                 <!-- spacer of 50px -->
                 <div style="width: 20px;"></div>
+                <!-- dropdown for when logged in -->
                 <?php
+                // check if user is logged in
                 if (isset($_SESSION['loggedin'])) {
+                    // if user is logged in show dropdown
                     echo "<div class='dropdown'>
                           <button class='btn btn-outline-light dropdown-toggle' type='button' id='dropdownMenuButton1' data-bs-toggle='dropdown' aria-expanded='false'>
                           $sessionname
@@ -151,7 +160,9 @@ if (isset($_POST['searchbutton'])) {
                                 <li><a class='dropdown-item' href='../acount/acount.php'>Profile</a></li>
                                 <li><a class='dropdown-item' href='../Post/Post.php'>Post</a></li>
                                 <li><a class='dropdown-item' href='../acount/logout.php'>Logout</a></li>
-                                ";if ($sessionrank == "Admin") {
+                                ";
+                    // if rank is admin show admin button
+                    if ($sessionrank == "Admin") {
                         echo "<li><a class='dropdown-item' href='../acount/Admin.php'>Admin</a></li>";
                     }"
                             </ul>
@@ -161,12 +172,14 @@ if (isset($_POST['searchbutton'])) {
             </div>
         </div>
     </nav>
+    <!-- end nav -->
 
+    <!-- profile page -->
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col col-lg-9 col-xl-7">
-                <div class="card">
-                    <div class="rounded-top text-white d-flex flex-row" style="background-color: #1f2029; height:200px;">
+                <div class="card" style="background-color: transparent; border-bottom-left-radius: 1em; border-bottom-right-radius: 1em;">
+                    <div class="rounded-top text-white d-flex flex-row" style="background-color: rgba(145,145,145,0.5); height:200px;">
                         <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px;">
                             <img src="../afbeeldingen/<?php echo $profielfoto ?>"
                                  alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
@@ -191,7 +204,7 @@ if (isset($_POST['searchbutton'])) {
                             </div>
                         </div>
                     </div>
-                    <div class="card-body p-4 text-black">
+                    <div class="card-body p-4 text-black" style="background-color: white; border-bottom-left-radius: 1em; border-bottom-right-radius: 1em;">
                         <div class="mb-5">
                             <p class="lead fw-normal mb-1">About</p>
                             <div class="p-4" style="background-color: #f8f9fa;">
@@ -200,16 +213,34 @@ if (isset($_POST['searchbutton'])) {
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <p class="lead fw-normal mb-0">Recent photos</p>
-                            <p class="mb-0"><a href="Posts.php?id=<?php echo $id?>" class="text-muted">Show all</a></p>
+                            <p class="mb-0"><a href="Posts.php?id=<?php echo $id?>" class="text-muted hover">Show all</a></p>
                         </div>
-                        <!-- show the 4 most recent posts user-->
+                        <div class="container">
                         <div class="row">
                             <?php
+                            // get the 4 most recent posts from the user
+                            $result = $db->query("SELECT * FROM Posts WHERE userID='$id' ORDER BY ID DESC LIMIT 4");
                             while ($row = $result->fetchArray()) {
+                                $title = $row['title'];
+                                $info = $row['info'];
+                                $afbeelding1 = $row['afbeelding1'];
                                 $carid = $row['ID'];
-                                echo "<div class='col-lg-3 col-md-6 mb-4 mb-lg-0' style='width: 50%'><div class='card rounded shadow-sm border-0'><div class='card-body p-4'><a href='../acount/inpost.php?id=$carid' style='color:black;'><img src='../afbeeldingen/" . $row['afbeelding1'] . "' alt='' class='img-fluid d-block mx-auto mb-3' style='width: 100%; height: 150px;'><h5>" . $row['title'] . "</h5><p class='small text-muted font-italic'>" . $row['info'] . "</p></a></div></div></div>";
+                                ?>
+                            <div class="col-md-4">
+                            <div class="card mb-4" style="max-height: 350px; min-height: 350px; overflow: hidden;">
+                                <a href="../acount/inpost.php?id=<?php echo $carid ?>"><img style="padding: 1em; border-radius: 1em; max-height: 100%;" class="card-img-top" src="../afbeeldingen/<?php echo $afbeelding1 ?>" alt="..." /></a>
+                                <div class="card-body" style="height: 150px; overflow: auto;">
+                                    <div class="small text-muted"><?php echo $username ?></div>
+                                    <h2 class="card-title h4"><?php echo $title ?></h2>
+                                    <p class="card-text"><?php echo $info ?></p>
+                                    <a class="btn btn-outline-dark" href="../acount/inpost.php?id=<?php echo $carid ?>">Read more →</a>
+                                </div>
+                            </div>
+                            </div>
+                            <?php
                             }
                             ?>
+                        </div>
                         </div>
                     </div>
                 </div>

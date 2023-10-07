@@ -30,6 +30,9 @@ if (isset($_POST['submitrank'])) {
     // redirect to admin page
     header("Location: Admin.php");
 }
+
+// get all posts
+$result = $db->query("SELECT * FROM Posts");
 ?>
 
 
@@ -91,6 +94,43 @@ if (isset($_POST['submitrank'])) {
     </div>
     <button type="submit" name="submitrank" class="btn btn-primary">Verander rank</button>
 </form>
+<!-- Posts -->
+<h1>Posts</h1>
+<!-- show all posts with bootstrap -->
+<?php
+// get all posts
+$result = $db->query("SELECT * FROM Posts");
+// put all posts in a table
+echo "<table class='table'>";
+echo "<thead>";
+echo "<tr>";
+echo "<th scope='col'>ID</th>";
+echo "<th scope='col'>Titel</th>";
+echo "<th scope='col'>Beschrijving</th>";
+echo "<th scope='col'>Afbeelding 1</th>";
+echo "<th scope='col'>Afbeelding 2</th>";
+echo "<th scope='col'>Afbeelding 3</th>";
+echo "<th scope='col'>Afbeelding 4</th>";
+echo "<th scope='col'>Afbeelding 5</th>";
+echo "<th scope='col'>Verwijder</th>";
+echo "</tr>";
+// show all posts
+while ($row = $result->fetchArray()) {
+    echo "<tr>";
+    echo "<th scope='row'>" . $row['ID'] . "</th>";
+    echo "<td>" . $row['title'] . "</td>";
+    echo "<td>" . $row['info'] . "</td>";
+    echo "<td> <img src='../afbeeldingen/" . $row['afbeelding1'] . "' alt='' style='max-width: 40px;'></td>";
+    echo "<td> <img src='../afbeeldingen/" . $row['afbeelding2'] . "' alt='' style='max-width: 40px;'></td>";
+    echo "<td><img src='../afbeeldingen/" . $row['afbeelding3'] . "' alt='' style='max-width: 40px;'></td>";
+    echo "<td><img src='../afbeeldingen/" . $row['afbeelding4'] . "' alt='' style='max-width: 40px;'></td>";
+    echo "<td><img src='../afbeeldingen/" . $row['afbeelding5'] . "' alt='' style='max-width: 40px;'></td>";
+    echo "<td><a href='deletepost.php?id=" . $row['ID'] . "'><button class='btn btn-danger'>Verwijder</button></a></td>";
+    echo "</tr>";
+}
+echo "</thead>";
+echo "<tbody>";
+?>
 <!-- bootstrap js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <!-- font awesome -->

@@ -16,13 +16,12 @@ if (!$db) {
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
+// check if user is logged in
 if (!isset($_SESSION['loggedin'])) {
-    $sessionname = "Bezoeker";
-    $sessionemail = null;
-    $sessionprofielfoto = "default.png";
-    $sessionbio = "Ik ben een bezoeker!";
-    $sessionrank = null;
+    // send user to login page
+    header("location: ../home/home.php");
 } elseif (isset($_SESSION['loggedin'])) {
+    // set session info if user is logged in
     $sesionid = $_SESSION['id'];
     $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
     $row = $result->fetchArray();
@@ -35,16 +34,9 @@ if (!isset($_SESSION['loggedin'])) {
     $error = "Error";
 }
 
-// ceck if user is logged in
-if (!isset($_SESSION['loggedin'])) {
-    $sessionrank = null;
-} else {
-    $sessionrank = $_SESSION['rank'];
-}
-
 // change rank into text
 if ($sessionrank == 0) {
-    $sessionrank = "User";
+    $sessionrank = "Verzamelaar";
 } elseif ($sessionrank == 1) {
     $sessionrank = "Admin";
 } elseif ($sessionrank == null) {
@@ -65,7 +57,7 @@ $post = $row['posts'];
 
 // change rank into text
 if ($rank == 0) {
-    $rank = "User";
+    $rank = "Verzamelaar";
 } elseif ($rank == 1) {
     $rank = "Admin";
 } else {
@@ -77,13 +69,16 @@ if (isset($_POST['submitprofielfoto'])) {
     // get file info
     $file = $_FILES['file'];
 
+    // get file info
     $fileName = $_FILES['file']['name'];
     $fileTmpName = $_FILES['file']['tmp_name'];
     $fileError = $_FILES['file']['error'];
 
+    // get file extension
     $fileExt = explode('.', $fileName);
     $fileActualExt = strtolower(end($fileExt));
 
+    // allowed file types
     $allowed = array('jpg', 'jpeg', 'png');
 
     // check if file is allowed
@@ -162,11 +157,6 @@ if (isset($_POST['searchbutton'])) {
     <link rel="stylesheet" href="../nav/nav.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
-        body{
-            margin-top:20px;
-            background-color:#1f2029;
-            color:#69707a;
-        }
         .img-account-profile {
             height: 10rem;
         }
@@ -209,8 +199,8 @@ if (isset($_POST['searchbutton'])) {
     </style>
 </head>
 <body>
-<section class="h-100" style="min-height: 100vh; background: #e7e7e7">
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1f2029;">
+<section class="h-100" style="min-height: 100vh;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(145, 145, 145, 0.5);">
         <div class="container-fluid">
             <a class="navbar-brand" href="../home/home.php">
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
@@ -233,7 +223,7 @@ if (isset($_POST['searchbutton'])) {
                 </form>
                 <br>
                 <!-- Search Results -->
-                <div class="search-results">
+                <div class="search-results" style="background-color: rgba(145, 145, 145, 0.5);">
                     <div class="container">
                         <?php
                         if ($searchresult !== null) {
@@ -243,7 +233,7 @@ if (isset($_POST['searchbutton'])) {
                                 $searchid = $searchrow['ID'];
                                 ?>
                                 <div class="profile-item">
-                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
+                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name hover">
                                         <img src="../afbeeldingen/<?php echo $searchprofilepic ?>" alt="Profile Picture" class="profile-picture">
                                         <?php echo $searchname ?></a>
                                 </div>
@@ -280,9 +270,9 @@ if (isset($_POST['searchbutton'])) {
     <div class="row">
         <div class="col-xl-4">
             <!-- Profile picture card-->
-            <div class="card mb-4 mb-xl-0">
-                <div class="card-header">Profile Picture</div>
-                <div class="card-body text-center">
+            <div class="card mb-4 mb-xl-0" style="background-color: transparent;">
+                <div class="card-header" style="background-color: rgba(145, 145, 145, 0.5);">Profile Picture</div>
+                <div class="card-body text-center" style="background: white;">
                     <!-- Profile picture image-->
                     <img class="img-account-profile rounded-circle mb-2" src="../afbeeldingen/<?php echo $profielfoto?>" alt="">
                     <!-- Profile picture help block-->
@@ -299,9 +289,9 @@ if (isset($_POST['searchbutton'])) {
         </div>
         <div class="col-xl-8">
             <!-- Account details card-->
-            <div class="card mb-4">
-                <div class="card-header">Account Details</div>
-                <div class="card-body">
+            <div class="card mb-4" style="background: transparent;">
+                <div class="card-header" style="background-color: rgba(145, 145, 145, 0.5);">Account Details</div>
+                <div class="card-body" style="background: #FFFFFF;">
                     <form method="post">
                         <!-- Form Group (username)-->
                         <div class="mb-3">

@@ -41,7 +41,7 @@ if (!isset($_SESSION['loggedin'])) {
 
 // change rank into text
 if ($sessionrank == 0) {
-    $sessionrank = "User";
+    $sessionrank = "Verzamelaar";
 } elseif ($sessionrank == 1) {
     $sessionrank = "Admin";
 } elseif ($sessionrank == null) {
@@ -57,8 +57,17 @@ if (isset($_POST['searchbutton'])) {
     $searchresult = $db->query($searchquery);
 }
 
-// get al info from post ID 3
-$result = $db->query("SELECT * FROM Posts WHERE ID='3'");
+// get al Posts
+$result = $db->query("SELECT * FROM Posts");
+// count how many posts there are
+$numberofposts = 0;
+while ($row = $result->fetchArray()) {
+    $numberofposts++;
+}
+// randamize a number
+$randomnumber = rand(1, $numberofposts);
+// get the post with the random number
+$result = $db->query("SELECT * FROM Posts WHERE ID='$randomnumber'");
 $row = $result->fetchArray();
 $mainposttitle = $row['title'];
 $mainposttext = $row['info'];
@@ -84,8 +93,8 @@ $mainpostusername = $row['username'];
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
-<section class="h-100" style="min-height: 100vh; background: #e7e7e7">
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1f2029;">
+<section class="h-100">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(145,145,145,0.5);">
         <div class="container-fluid">
             <a class="navbar-brand" href="../home/home.php">
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
@@ -108,7 +117,7 @@ $mainpostusername = $row['username'];
                 </form>
                 <br>
                 <!-- Search Results -->
-                <div class="search-results">
+                <div class="search-results" style="background-color: rgba(145,145,145,0.5);">
                     <div class="container">
                         <?php
                         if ($searchresult !== null) {
@@ -118,7 +127,7 @@ $mainpostusername = $row['username'];
                                 $searchid = $searchrow['ID'];
                                 ?>
                                 <div class="profile-item">
-                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
+                                    <a class="hover" href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
                                         <img src="../afbeeldingen/<?php echo $searchprofilepic ?>" alt="Profile Picture" class="profile-picture">
                                         <?php echo $searchname ?></a>
                                 </div>
@@ -154,15 +163,15 @@ $mainpostusername = $row['username'];
     <div class="container">
         <div class="row">
             <!-- Blog entries-->
-            <div class="col-lg-8">
+            <div class="col-lg-8" style="background-color: rgba(145,145,145,0.7); padding: 2em; border-radius: 2em; margin-bottom: 1em;">
                 <!-- Featured blog post-->
                 <div class="card mb-4">
-                    <a href="../acount/inpost.php?id=3"><img style="padding: 1em; border-radius: 1em;" class="card-img-top" src="../afbeeldingen/<?php echo $mainpostimage ?>" alt="..." /></a>
+                    <a href="../acount/inpost.php?id=<?php echo $randomnumber ?>"><img style="padding: 1em; border-radius: 1em;" class="card-img-top" src="../afbeeldingen/<?php echo $mainpostimage ?>" alt="..." /></a>
                     <div class="card-body">
                         <div class="small text-muted"><?php echo $mainpostusername ?></div>
                         <h2 class="card-title"><?php echo $mainposttitle ?></h2>
                         <p class="card-text"><?php echo $mainposttext ?></p>
-                        <a class="btn btn-outline-dark" href="../acount/inpost.php?id=3">Read more →</a>
+                        <a class="btn btn-outline-dark" href="../acount/inpost.php?id=<?php echo $randomnumber ?>">Read more →</a>
                     </div>
                 </div>
                 <!-- Nested row for non-featured blog posts-->
@@ -187,14 +196,12 @@ $mainpostusername = $row['username'];
                                 $userRow = $userResult->fetchArray();
                                 $username = $userRow['username'];
                                 ?>
-                                <!-- Blog post -->
-                                <div class="card mb-4">
-                                    <a href="../acount/inpost.php?id=<?php echo $postID?>"><img style="padding: 1em; border-radius: 1em;" class="card-img-top" src="../afbeeldingen/<?php echo $afbeelding1 ?>" alt="..." /></a>
-                                    <div class="card-body">
+                                <div class="card mb-4" style="overflow: hidden;">
+                                    <a href="../acount/inpost.php?id=<?php echo $postID ?>"><img style="padding: 1em; border-radius: 1em; max-height: 100%;" class="card-img-top" src="../afbeeldingen/<?php echo $afbeelding1 ?>" alt="..." /></a>
+                                    <div class="card-body" style="height: 150px; overflow: auto;">
                                         <div class="small text-muted"><?php echo $username ?></div>
                                         <h2 class="card-title h4"><?php echo $title ?></h2>
-                                        <p class="card-text"><?php echo $info?></p>
-                                        <a class="btn btn-outline-dark" href="../acount/inpost.php?id=<?php echo $postID?>">Read more →</a>
+                                        <p class="card-text"><?php echo $info ?></p>
                                     </div>
                                 </div>
                                 <?php
@@ -225,14 +232,12 @@ $mainpostusername = $row['username'];
                                 $userRow = $userResult->fetchArray();
                                 $username = $userRow['username'];
                                 ?>
-                                <!-- Blog post -->
-                                <div class="card mb-4">
-                                    <a href="../acount/inpost.php?id=<?php echo $postID?>"><img style="padding: 1em; border-radius: 1em;" class="card-img-top" src="../afbeeldingen/<?php echo $afbeelding1 ?>" alt="..." /></a>
-                                    <div class="card-body">
+                                <div class="card mb-4" style="overflow: hidden;">
+                                    <a href="../acount/inpost.php?id=<?php echo $postID ?>"><img style="padding: 1em; border-radius: 1em; max-height: 100%;" class="card-img-top" src="../afbeeldingen/<?php echo $afbeelding1 ?>" alt="..." /></a>
+                                    <div class="card-body" style="height: 150px; overflow: auto;">
                                         <div class="small text-muted"><?php echo $username ?></div>
                                         <h2 class="card-title h4"><?php echo $title ?></h2>
-                                        <p class="card-text"><?php echo $info?></p>
-                                        <a class="btn btn-outline-dark" href="../acount/inpost.php?id=<?php echo $postID?>">Read more →</a>
+                                        <p class="card-text"><?php echo $info ?></p>
                                     </div>
                                 </div>
                                 <?php
@@ -246,19 +251,19 @@ $mainpostusername = $row['username'];
 
             <!-- Search widget -->
             <div class="col-lg-4">
-                <div class="card mb-4" style="display: flex; align-content: center; justify-content: center">
+                <div class="card mb-4" style="display: flex; align-content: center; justify-content: center; background-color: rgba(145,145,145,1); border-bottom-left-radius: 1em; border-bottom-right-radius: 1em;"">
                     <div class="card-header">Search</div>
-                    <div class="card-body">
+                    <div class="card-body" style=" background-color: white; border-bottom-left-radius: 1em; border-bottom-right-radius: 1em;"">
                         <form method="GET" action="">
                             <div class="input-group">
-                                <input class="form-control" type="text" name="search_term" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+                                <input class="form-control" type="text" name="search_term" placeholder="Enter name of car or brand..." aria-label="Enter search term..." aria-describedby="button-search" />
                                 <button class="btn btn-outline-dark" id="button-search" type="submit">Go!</button>
                             </div>
                         </form>
                     </div>
 
                     <!-- Display search results with a scrollable section -->
-                    <div class="col-lg-8" style="max-height: 400px; overflow-y: scroll; width: 100%">
+                    <div class="col-lg-8" style="max-height: 400px; overflow-y: scroll; width: 100%;">
                         <?php
                         if(isset($_GET['search_term'])) {
                             $search_term = $_GET['search_term'];
@@ -300,29 +305,29 @@ $mainpostusername = $row['username'];
 
         </div>
                 <!-- Categories widget-->
-                <div class="card mb-4">
+                <div class="card mb-4" style="background-color: rgba(145,145,145,1); border-bottom-left-radius: 1em; border-bottom-right-radius: 1em;"">
                     <div class="card-header">Categories</div>
-                    <div class="card-body">
+                    <div class="card-body" style="border-bottom-left-radius: 1em; border-bottom-right-radius: 1em; background-color: white;">
                         <div class="row">
                             <div class="col-sm-6">
                                 <ul class="list-unstyled mb-0">
-                                    <li><a style="color: black; text-decoration: none" href="#!">Old Timer</a></li>
-                                    <li><a style="color: black; text-decoration: none" href="#!">Sports Car</a></li>
-                                    <li><a style="color: black; text-decoration: none" href="#!">SUV</a></li>
+                                    <li><a style="color: black; text-decoration: none" class="hover" href="category.php?id=1">Old Timer</a></li>
+                                    <li><a style="color: black; text-decoration: none" class="hover" href="category.php?id=2">Sports Car</a></li>
+                                    <li><a style="color: black; text-decoration: none" class="hover" href="category.php?id=3">SUV</a></li>
                                 </ul>
                             </div>
                             <div class="col-sm-6">
                                 <ul class="list-unstyled mb-0">
-                                    <li><a style="color: black; text-decoration: none" href="#!">SuperCar</a></li>
-                                    <li><a style="color: black; text-decoration: none" href="#!">HyperCar</a></li>
-                                    <li><a style="color: black; text-decoration: none" href="#!">Muscle Car</a></li>
+                                    <li><a style="color: black; text-decoration: none" class="hover" href="category.php?id=4">Super Car</a></li>
+                                    <li><a style="color: black; text-decoration: none" class="hover" href="category.php?id=5">Hyper Car</a></li>
+                                    <li><a style="color: black; text-decoration: none" class="hover" href="category.php?id=6">Muscle Car</a></li>
                                 </ul>
                             </div>
                             <div class="col-sm-6">
                                 <ul class="list-unstyled mb-0">
-                                    <li><a style="color: black; text-decoration: none" href="#!">Tuner Car</a></li>
-                                    <li><a style="color: black; text-decoration: none" href="#!">Trucks</a></li>
-                                    <li><a style="color: black; text-decoration: none" href="#!">Other</a></li>
+                                    <li><a style="color: black; text-decoration: none" class="hover" href="category.php?id=7">Tuner Car</a></li>
+                                    <li><a style="color: black; text-decoration: none" class="hover" href="category.php?id=8">Trucks</a></li>
+                                    <li><a style="color: black; text-decoration: none" class="hover" href="category.php?id=9">Other</a></li>
                                 </ul>
                             </div>
                         </div>

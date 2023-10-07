@@ -14,13 +14,17 @@ if (!$db) {
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
+// check if user is logged in
 if (!isset($_SESSION['loggedin'])) {
+    // set user info if user is not logged in
     $sessionname = "Bezoeker";
     $sessionemail = null;
     $sessionprofielfoto = "default.png";
     $sessionbio = "Ik ben een bezoeker!";
     $sessionrank = null;
+    $sesionid = null;
 } elseif (isset($_SESSION['loggedin'])) {
+    // set user info if user is logged in
     $sesionid = $_SESSION['id'];
     $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
     $row = $result->fetchArray();
@@ -31,13 +35,6 @@ if (!isset($_SESSION['loggedin'])) {
     $sessionrank = $row['rank'];
 } else {
     $error = "Error";
-}
-
-// ceck if user is logged in
-if (!isset($_SESSION['loggedin'])) {
-    $sessionrank = null;
-} else {
-    $sessionrank = $_SESSION['rank'];
 }
 
 // change rank into text
@@ -102,6 +99,7 @@ $row = $result->fetchArray();
 $username = $row['username'];
 $profielfoto = $row['profielfoto'];
 
+// search
 $searchresult = null;
 if (isset($_POST['searchbutton'])) {
     $search = $_POST['searchinput'];
@@ -118,26 +116,20 @@ if (isset($_POST['searchbutton'])) {
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo $title ?> By <?php echo $username?></title>
+    <link rel="stylesheet" href="../nav/nav.css">
     <style>
-        .gradient-custom-2 {
-            background: #1f2029;
-        }
-        .flex{
-            display: flex;
-            flex-wrap: wrap;
-        }
-        /* flex child*/
-        .flex > *{
-            flex: 1 1 50%;
+        .custom-enlarged-image {
+            width: 100%; /* Expand to 100% width */
+            height: auto; /* Maintain aspect ratio */
+            max-height: none; /* Remove max height */
         }
     </style>
-    <link rel="stylesheet" href="../nav/nav.css">
     <link rel="icon" href="../afbeeldingen/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
-<section class="h-100" style="min-height: 100vh; background: #e7e7e7">
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1f2029;">
+<section class="h-100" style="min-height: 100vh;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(145, 145, 145, 0.5);">
         <div class="container-fluid">
             <a class="navbar-brand" href="../home/home.php">
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
@@ -160,7 +152,7 @@ if (isset($_POST['searchbutton'])) {
                 </form>
                 <br>
                 <!-- Search Results -->
-                <div class="search-results">
+                <div class="search-results" style="background-color: rgba(145, 145, 145, 0.5);">
                     <div class="container">
                         <?php
                         if ($searchresult !== null) {
@@ -170,7 +162,7 @@ if (isset($_POST['searchbutton'])) {
                                 $searchid = $searchrow['ID'];
                                 ?>
                                 <div class="profile-item">
-                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
+                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name hover">
                                         <img src="../afbeeldingen/<?php echo $searchprofilepic ?>" alt="Profile Picture" class="profile-picture">
                                         <?php echo $searchname ?></a>
                                 </div>
@@ -205,39 +197,68 @@ if (isset($_POST['searchbutton'])) {
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col col-lg-9 col-xl-7" style="width: 95%">
-                <div class="card">
-                    <div class="rounded-top text-white d-flex flex-row" style="background-color: #1f2029; height:200px;">
+                <div class="card" style="background-color: rgba(145, 145, 145, 0.5);">
+                    <div class="rounded-top text-white d-flex flex-row" style="background-color: rgba(145, 145, 145, 0.5); height:200px;">
                         <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px;">
                             <img src="../afbeeldingen/<?php echo $profielfoto ?>"
                                  alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
                                  style="width: 150px; z-index: 1">
                         </div>
                         <div class="ms-3" style="margin-top: 130px;">
-                            <a href="profile.php?id=<?php echo $userid ?>" style="color: white;">
+                            <a href="profile.php?id=<?php echo $userid ?>" style="color: white;" class="hover">
                             <h5><?php echo $username?></h5>
                             </a>
                         </div>
                     </div>
-                    <div class="card-body p-4 text-black" style="width: 100%">
+                    <div class="card-body p-4 text-black" style="width: 100%; background-color: rgba(145, 145, 145, 0.5)">
                         <div class="mb-5">
-                            <div class="p-4" style="background-color: #f8f9fa;">
+                            <div class="p-4" style="background-color: rgba(145, 145, 145, 0.5);">
                                 <div class="row">
-                                    <?php
-                                    $images = array($img1, $img2, $img3, $img4, $img5);
-                                    $numImages = count(array_filter($images)); // Count the non-null images
+                                    <!-- Create a Bootstrap Carousel -->
+                                    <div id="imageSlider" class="carousel slide" data-ride="carousel">
+                                        <div class="carousel-inner">
+                                            <?php
+                                            $images = array($img1, $img2, $img3, $img4, $img5);
+                                            $numImages = count(array_filter($images)); // Count the non-null images
 
-                                    // Determine the column width based on the number of images
-                                    $colWidth = ($numImages > 1) ? "col-md-6" : "col-md-12";
+                                            foreach ($images as $index => $image) {
+                                                if (!empty($image)) {
+                                                    // Determine if it's the first image, and add the 'active' class accordingly
+                                                    $activeClass = ($index === 0) ? 'active' : '';
+                                                    ?>
+                                                    <div class="carousel-item <?php echo $activeClass; ?>">
+                                                        <a href="#" data-toggle="modal" data-target="#imageModal<?php echo $index; ?>">
+                                                            <img src="../afbeeldingen/<?php echo $image; ?>" alt="Image" class="d-block w-100 custom-image">
+                                                        </a>
+                                                    </div>
 
-                                    foreach ($images as $image) {
-                                        if (!empty($image)) {
-                                            echo "<div class='$colWidth'>
-                            <img src='../afbeeldingen/$image' alt='Image' class='img-fluid mb-4 rounded' style='width: 100%; height: auto;'>
-                        </div>";
-                                        }
-                                    }
-                                    ?>
-                                    <div class="col-md-12">
+                                                    <!-- Modal for Enlarged Image -->
+                                                    <div class="modal fade" id="imageModal<?php echo $index; ?>" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog modal-lg" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-body">
+                                                                    <img src="../afbeeldingen/<?php echo $image; ?>" alt="Image" class="img-fluid custom-enlarged-image">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+
+                                        <!-- Add navigation buttons -->
+                                        <a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="sr-only"></span>
+                                        </a>
+                                        <a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="sr-only"></span>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-12" style="background-color: rgba(145,145,145,1); color: white;">
                                         <hr>
                                         <div class="col-md-6">
                                             <h1><?php echo $title ?></h1>
@@ -255,15 +276,60 @@ if (isset($_POST['searchbutton'])) {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            <!-- button to Bidden page -->
+                            <?php
+                            // get besteld from Posts in db
+                            $result = $db->query("SELECT * FROM Posts WHERE ID='$id'");
+                            $row = $result->fetchArray();
+                            $besteld = $row['besteld'];
+                            // check if besteld is 1
+                            if ($besteld == 1) {
+                                echo "<div class='row'>
+                                <div class='col-md-12'>
+                                    <h1 style='color: red; text-align: center;'>Deze auto is al verkocht!</h1>
+                                </div>
+                            </div>";
+                            } else {
+                                echo "<div class='row'>
+                                <div class='col-md-12'>
+                                    <a href='../Post/bieden.php?id=$id'><button class='btn btn-outline-light' style='width: 100%; margin-top: 10px;'>Bieden</button></a>
+                                </div>
+                            </div>";
+                            }
+                            ?>
+                            <?php
+                            // check if this is your post
+                            if ($userid == $sesionid) {
+                                echo "<div class='row'>
+                                <div class='col-md-12'>
+                                   <!-- button for putting it on sold -->
+                                    <a href='../Post/sold.php?id=$id'><button class='btn btn-outline-light' style='width: 100%; margin-top: 10px;'>Sold</button></a>
+                                </div>
+                            </div>";
+                            ?>
+                            <?php
+                            } else {
+                                echo "";
+                            }
+                            ?>
                     </div>
                 </div>
         </div>
     </div>
 </section>
-<!-- bootstrap js -->
+<!-- Include jQuery and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <!-- font awesome -->
 <script src="https://kit.fontawesome.com/2a8f5c1a81.js" crossorigin="anonymous"></script>
+<script>
+    // Initialize the Bootstrap Carousel
+    $(document).ready(function () {
+        $('#imageSlider').carousel();
+    });
+</script>
 </body>
 </html>

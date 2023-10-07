@@ -1,22 +1,25 @@
 <?php
+// start session
 session_start();
 
+// connect to database
 $db = new SQLite3('../database/database.db');
 
+// check if connection is made
 if (!$db) {
     die("Connection failed: " . $db->connect_error);
 }
 
+// error handeling
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
+// check if user is logged in
 if (!isset($_SESSION['loggedin'])) {
-    $sessionname = "Bezoeker";
-    $sessionemail = null;
-    $sessionprofielfoto = "default.png";
-    $sessionbio = "Ik ben een bezoeker!";
-    $sessionrank = null;
+    // send user to login page
+    header("location: ../home/home.php");
 } elseif (isset($_SESSION['loggedin'])) {
+    // set session variables if user is logged in
     $sesionid = $_SESSION['id'];
     $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
     $row = $result->fetchArray();
@@ -29,16 +32,9 @@ if (!isset($_SESSION['loggedin'])) {
     $error = "Error";
 }
 
-// ceck if user is logged in
-if (!isset($_SESSION['loggedin'])) {
-    $sessionrank = null;
-} else {
-    $sessionrank = $_SESSION['rank'];
-}
-
 // change rank into text
 if ($sessionrank == 0) {
-    $sessionrank = "User";
+    $sessionrank = "Verzamelaar";
 } elseif ($sessionrank == 1) {
     $sessionrank = "Admin";
 } elseif ($sessionrank == null) {
@@ -47,6 +43,7 @@ if ($sessionrank == 0) {
     $sessionrank = "Error";
 }
 
+// check if user has posted
 if (isset($_POST['submit'])) {
     $id = $_SESSION['id'];
     $title = $_POST['title'];
@@ -96,9 +93,7 @@ if (isset($_POST['submit'])) {
         }
     }
 
-
-
-
+    // Loop through each file in files[] array
     for ($i = 1; $i <= 5; $i++) {
         $imageKey = 'afbeelding' . $i;
         $imageName = $_FILES[$imageKey]['name'];
@@ -130,6 +125,7 @@ if (isset($_POST['submit'])) {
     $image4 = isset($imageNames[3]) ? $imageNames[3] : "";
     $image5 = isset($imageNames[4]) ? $imageNames[4] : "";
 
+    // insert data into database
     $stmt = $db->prepare("INSERT INTO Posts (title, info, afbeelding1, afbeelding2, afbeelding3, afbeelding4, afbeelding5, userID, merk, model, bouwjaar, kmstand, kleur, vermogen, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindParam(1, $title);
     $stmt->bindParam(2, $content);
@@ -156,6 +152,7 @@ if (isset($_POST['submit'])) {
     $db->exec("UPDATE Login SET posts='$post' WHERE ID='$id'");
 }
 
+// search
 $searchresult = null;
 if (isset($_POST['searchbutton'])) {
     $search = $_POST['searchinput'];
@@ -175,20 +172,11 @@ if (isset($_POST['searchbutton'])) {
     <link rel="icon" href="../afbeeldingen/logo.png">
     <!-- bootstrap css -->
     <link rel="stylesheet" href="../nav/nav.css">
-    <style>
-        .gradient-custom-2 {
-            background: #1f2029;
-            color: white;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-    </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
-<section class="h-100 gradient-custom-2" style="min-height: 100vh; background-color: #c4c3ca;">
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1f2029;">
+<section class="h-100 gradient-custom-2" style="min-height: 100vh;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(145,145,145,0.5);">
         <div class="container-fluid">
             <a class="navbar-brand" href="../home/home.php">
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
@@ -211,7 +199,7 @@ if (isset($_POST['searchbutton'])) {
                 </form>
                 <br>
                 <!-- Search Results -->
-                <div class="search-results">
+                <div class="search-results" style="background: rgba(145,145,145,0.5);">
                     <div class="container">
                         <?php
                         if ($searchresult !== null) {
@@ -221,7 +209,7 @@ if (isset($_POST['searchbutton'])) {
                                 $searchid = $searchrow['ID'];
                                 ?>
                                 <div class="profile-item">
-                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
+                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name hover">
                                         <img src="../afbeeldingen/<?php echo $searchprofilepic ?>" alt="Profile Picture" class="profile-picture">
                                         <?php echo $searchname ?></a>
                                 </div>
@@ -253,7 +241,7 @@ if (isset($_POST['searchbutton'])) {
             </div>
         </div>
     </nav>
-    <div class="container my-5" style="background-color: white; padding: 3em; border-radius: 1em; box-shadow: #69707a; color: black;">
+    <div class="container my-5" style="background-color: rgba(145,145,145,0.5); padding: 3em; border-radius: 1em; box-shadow: #69707a; color: white;">
         <div class="row justify-content-center">
             <div class="col-lg-9">
                 <h1 class="mb-3">Post!</h1>
@@ -262,19 +250,19 @@ if (isset($_POST['searchbutton'])) {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="your-name" class="form-label">Name of car</label>
-                            <input type="text" class="form-control" id="your-name" name="title" required>
+                            <input type="text" class="form-control" id="your-name" name="title" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
                             <label for="your-email" class="form-label">Merk</label>
-                            <input type="text" class="form-control" id="your-email" name="merk" required>
+                            <input type="text" class="form-control" id="your-email" name="merk" style="background: transparent;" required>
                         </div>
                         <div class="col-12">
                             <label for="your-message" class="form-label">Info over auto</label>
-                            <textarea class="form-control" id="your-message" name="content" rows="5" required></textarea>
+                            <textarea class="form-control" id="your-message" name="content" rows="5" style="background: transparent;" required></textarea>
                         </div>
                         <div class="col-12">
                             <label for="your-picture" class="form-label">Category</label>
-                            <select class="form-select" aria-label="Default select example" name="category">
+                            <select class="form-select" aria-label="Default select example" name="category" style="background: transparent; color: black;">
                                 <option selected>Open this select menu</option>
                                 <option value="1">oldtimer</option>
                                 <option value="2">sportcar</option>
@@ -289,47 +277,47 @@ if (isset($_POST['searchbutton'])) {
                         </div>
                         <div class="col-md-6">
                             <label for="your-email" class="form-label">Model</label>
-                            <input type="text" class="form-control" id="your-email" name="model" required>
+                            <input type="text" class="form-control" id="your-email" name="model" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
                             <label for="your-email" class="form-label">Bouwjaar</label>
-                            <input type="text" class="form-control" id="your-email" name="bouwjaar" required>
+                            <input type="text" class="form-control" id="your-email" name="bouwjaar" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
                             <label for="your-email" class="form-label">Km stand</label>
-                            <input type="text" class="form-control" id="your-email" name="kmstand" required>
+                            <input type="text" class="form-control" id="your-email" name="kmstand" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
                             <label for="your-email" class="form-label">Kleur</label>
-                            <input type="text" class="form-control" id="your-email" name="kleur" required>
+                            <input type="text" class="form-control" id="your-email" name="kleur" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
                             <label for="your-email" class="form-label">Vermogen</label>
-                            <input type="text" class="form-control" id="your-email" name="vermogen" required>
+                            <input type="text" class="form-control" id="your-email" name="vermogen" style="background: transparent;" required>
                         </div>
                         <div class="col-12">
                             <label for="your-picture" class="form-label">Afbeelding 1</label>
-                            <input type="file" class="form-control" id="your-picture" name="afbeelding1" required>
+                            <input type="file" class="form-control" id="your-picture" name="afbeelding1" style="background: transparent; color: white;" required>
                         </div>
                         <div class="col-12">
                             <label for="your-picture" class="form-label">Afbeelding 2 (optional)</label>
-                            <input type="file" class="form-control" id="your-picture" name="afbeelding2">
+                            <input type="file" class="form-control" id="your-picture" name="afbeelding2" style="background: transparent; color: white;">
                         </div>
                         <div class="col-12">
                             <label for="your-picture" class="form-label">Afbeelding 3 (optional)</label>
-                            <input type="file" class="form-control" id="your-picture" name="afbeelding3">
+                            <input type="file" class="form-control" id="your-picture" name="afbeelding3" style="background: transparent; color: white;">
                         </div>
                         <div class="col-12">
                             <label for="your-picture" class="form-label">Afbeelding 4 (optional)</label>
-                            <input type="file" class="form-control" id="your-picture" name="afbeelding4">
+                            <input type="file" class="form-control" id="your-picture" name="afbeelding4" style="background: transparent; color: white;">
                         </div>
                         <div class="col-12">
                             <label for="your-picture" class="form-label">Afbeelding 5 (optional)</label>
-                            <input type="file" class="form-control" id="your-picture" name="afbeelding5">
+                            <input type="file" class="form-control" id="your-picture" name="afbeelding5" style="background: transparent; color: white;">
                         </div>
                         <div class="col-12">
                             <div class="row">
-                                <button type="submit" class="btn btn-outline-dark w-100 fw-bold" style="width: 100%" name="submit">Send</button>
+                                <button type="submit" class="btn btn-outline-light w-100 fw-bold" style="width: 100%" name="submit">Send</button>
                             </div>
                         </div>
                     </div>

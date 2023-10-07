@@ -1,22 +1,29 @@
 <?php
+// start session
 session_start();
 
+// connect to database
 $db = new SQLite3('database/database.db');
 
+// check if connection is made
 if (!$db) {
     die("Connection failed: " . $db->connect_error);
 }
 
+// error reporting
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
+// check if user is logged in
 if (!isset($_SESSION['loggedin'])) {
+    // if not logged in set session variables to null
     $sessionname = "Bezoeker";
     $sessionemail = null;
     $sessionprofielfoto = "default.png";
     $sessionbio = "Ik ben een bezoeker!";
     $sessionrank = null;
 } elseif (isset($_SESSION['loggedin'])) {
+    // if logged in get session variables
     $sesionid = $_SESSION['id'];
     $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
     $row = $result->fetchArray();
@@ -29,16 +36,9 @@ if (!isset($_SESSION['loggedin'])) {
     $error = "Error";
 }
 
-// ceck if user is logged in
-if (!isset($_SESSION['loggedin'])) {
-    $sessionrank = null;
-} else {
-    $sessionrank = $_SESSION['rank'];
-}
-
 // change rank into text
 if ($sessionrank == 0) {
-    $sessionrank = "User";
+    $sessionrank = "Verzamelaar";
 } elseif ($sessionrank == 1) {
     $sessionrank = "Admin";
 } elseif ($sessionrank == null) {
@@ -54,13 +54,20 @@ if (isset($_POST['submit'])) {
     $message = $_POST['message'];
     $reden = $_POST['reden'];
 
-    $mailTo = "89710@glr.nl";
+    // get mail from admin
+    $result = $db->query("SELECT * FROM Login WHERE rank='1'");
+    $row = $result->fetchArray();
+
+    // send mail
+    $mailTo = "$row[email]";
     $headers = "From: ".$mailFrom;
     $txt = "You have recieved an e-mail from ".$name;
     $body = "Name: ".$name."\n\n".$message."\n\n".$reden;
     mail($mailTo, $txt, $body, $headers);
     header("Location: home/home.php");
 }
+
+// search
 $searchresult = null;
 if (isset($_POST['searchbutton'])) {
     $search = $_POST['searchinput'];
@@ -70,7 +77,7 @@ if (isset($_POST['searchbutton'])) {
 ?>
 
 <!doctype html>
-<html lang="en" class="gradient-custom-2">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -78,13 +85,12 @@ if (isset($_POST['searchbutton'])) {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Contact the admin!</title>
     <link rel="icon" href="afbeeldingen/logo.png">
-    <!-- bootstrap css -->
     <link rel="stylesheet" href="nav/nav.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
-<section class="h-100 gradient-custom-2" style="min-height: 100vh; background-color: #c4c3ca;">
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1f2029;">
+<section class="h-100" style="min-height: 100vh;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(145,145,145,0.5);">
         <div class="container-fluid">
             <a class="navbar-brand" href="home/home.php">
                 <img src="afbeeldingen/logo.png" alt="" class="logo">
@@ -107,7 +113,7 @@ if (isset($_POST['searchbutton'])) {
                 </form>
                 <br>
                 <!-- Search Results -->
-                <div class="search-results">
+                <div class="search-results" style="background: rgba(145,145,145,0.5);">
                     <div class="container">
                         <?php
                         if ($searchresult !== null) {
@@ -117,7 +123,7 @@ if (isset($_POST['searchbutton'])) {
                                 $searchid = $searchrow['ID'];
                                 ?>
                                 <div class="profile-item">
-                                    <a href="acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
+                                    <a href="acount/profile.php?id=<?php echo $searchid ?>" class="profile-name hover">
                                         <img src="afbeeldingen/<?php echo $searchprofilepic ?>" alt="Profile Picture" class="profile-picture">
                                         <?php echo $searchname ?></a>
                                 </div>
@@ -149,7 +155,7 @@ if (isset($_POST['searchbutton'])) {
             </div>
         </div>
     </nav>
-<div class="container my-5" style="background-color: white; padding: 3em; border-radius: 1em; box-shadow: #69707a;">
+<div class="container my-5" style="background-color: rgba(145,145,145,0.5); padding: 3em; border-radius: 1em; box-shadow: #69707a; color: white">
     <div class="row justify-content-center">
         <div class="col-lg-9">
             <h1 class="mb-3">Ask the Admin</h1>
@@ -158,21 +164,21 @@ if (isset($_POST['searchbutton'])) {
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="your-name" class="form-label">Your Name</label>
-                        <input type="text" class="form-control" id="your-name" name="name" required>
+                        <input type="text" class="form-control" id="your-name" name="name" style="background: transparent;" required>
                     </div>
                     <div class="col-md-6">
                         <label for="your-email" class="form-label">Your Email</label>
-                        <input type="email" class="form-control" id="your-email" name="mail" required>
+                        <input type="email" class="form-control" id="your-email" name="mail" style="background: transparent;" required>
                     </div>
                     <div class="col-12">
                         <label for="your-message" class="form-label">Your Message</label>
-                        <textarea class="form-control" id="your-message" name="message" rows="5" required></textarea>
+                        <textarea class="form-control" id="your-message" name="message" rows="5" style="background: transparent;" required></textarea>
                     </div>
                     <!-- input for picture -->
                     <div class="col-12">
                         <label for="your-picture" class="form-label">Your reason</label>
                         <!-- dropdown -->
-                        <select class="form-select" aria-label="Default select example" name="reden">
+                        <select class="form-select" aria-label="Default select example" name="reden" style="background: transparent; color: white;">
                             <option selected>Open this select menu</option>
                             <option value="I want to post my collection">I want to post my collection</option>
                             <option value="I have a question/ bug">I have a question/ bug</option>
@@ -181,7 +187,7 @@ if (isset($_POST['searchbutton'])) {
                     </div>
                     <div class="col-12">
                         <div class="row">
-                                <button type="submit" class="btn btn-outline-dark w-100 fw-bold" style="width: 100%" name="submit">Send</button>
+                                <button type="submit" class="btn btn-outline-light w-100 fw-bold" style="width: 100%" name="submit">Send</button>
                         </div>
                     </div>
                 </div>

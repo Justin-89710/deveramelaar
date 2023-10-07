@@ -13,13 +13,16 @@ if (!$db) {
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
+// check if user is logged in
 if (!isset($_SESSION['loggedin'])) {
+    // set session variables if user is not logged in
     $sessionname = "Bezoeker";
     $sessionemail = null;
     $sessionprofielfoto = "default.png";
     $sessionbio = "Ik ben een bezoeker!";
     $sessionrank = null;
 } elseif (isset($_SESSION['loggedin'])) {
+    // set session variables if user is logged in
     $sesionid = $_SESSION['id'];
     $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
     $row = $result->fetchArray();
@@ -32,16 +35,9 @@ if (!isset($_SESSION['loggedin'])) {
     $error = "Error";
 }
 
-// ceck if user is logged in
-if (!isset($_SESSION['loggedin'])) {
-    $sessionrank = null;
-} else {
-    $sessionrank = $_SESSION['rank'];
-}
-
 // change rank into text
 if ($sessionrank == 0) {
-    $sessionrank = "User";
+    $sessionrank = "Verzamelaar";
 } elseif ($sessionrank == 1) {
     $sessionrank = "Admin";
 } elseif ($sessionrank == null) {
@@ -98,16 +94,11 @@ if (isset($_POST['searchbutton'])) {
     <title>All Posts of <?php echo $username ?></title>
     <link rel="icon" href="../afbeeldingen/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <style>
-        .gradient-custom-2 {
-            background: #1f2029;
-        }
-    </style>
     <link rel="stylesheet" href="../nav/nav.css">
 </head>
 <body>
-<section class="h-100" style="min-height: 100vh; background: #e7e7e7">
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1f2029;">
+<section class="h-100" style="min-height: 100vh">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(145,145,145,0.5);">
         <div class="container-fluid">
             <a class="navbar-brand" href="../home/home.php">
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
@@ -130,7 +121,7 @@ if (isset($_POST['searchbutton'])) {
                 </form>
                 <br>
                 <!-- Search Results -->
-                <div class="search-results">
+                <div class="search-results" style="background-color: rgba(145,145,145,0.5);">
                     <div class="container">
                         <?php
                         if ($searchresult !== null) {
@@ -140,7 +131,7 @@ if (isset($_POST['searchbutton'])) {
                                 $searchid = $searchrow['ID'];
                                 ?>
                                 <div class="profile-item">
-                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
+                                    <a href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name hover">
                                         <img src="../afbeeldingen/<?php echo $searchprofilepic ?>" alt="Profile Picture" class="profile-picture">
                                         <?php echo $searchname ?></a>
                                 </div>
@@ -175,15 +166,15 @@ if (isset($_POST['searchbutton'])) {
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col col-lg-9 col-xl-7">
-                <div class="card">
-                    <div class="rounded-top text-white d-flex flex-row" style="background-color: #1f2029; height:200px;">
+                <div class="card" style="background: white;">
+                    <div class="rounded-top text-white d-flex flex-row" style="background-color: rgba(145,145,145,0.5); height:200px;">
                         <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px;">
                             <img src="../afbeeldingen/<?php echo $profielfoto ?>"
                                  alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
                                  style="width: 150px; z-index: 1">
                         </div>
                         <div class="ms-3" style="margin-top: 130px;">
-                            <a href="../acount/profile.php?id=<?php echo $id ?>" style="color: white">
+                            <a href="../acount/profile.php?id=<?php echo $id ?>" style="color: white" class="hover">
                             <h5><?php echo $username?></h5>
                             </a>
                             <p><?php echo $rank ?></p>
@@ -205,7 +196,19 @@ if (isset($_POST['searchbutton'])) {
                             while ($row = $result->fetchArray()) {
                                 // get car id from database
                                 $carid = $row['ID'];
-                                echo "<div class='col-lg-3 col-md-6 mb-4 mb-lg-0' style='width: 50%'><div class='card rounded shadow-sm border-0'><div class='card-body p-4'><a href='inpost.php?id=$carid' style='color: black'><img src='../afbeeldingen/" . $row['afbeelding1'] . "' alt='' class='img-fluid d-block mx-auto mb-3' style='width: 100%; height: 150px;'><h5>" . $row['title'] . "</h5><p class='small text-muted font-italic'>" . $row['info'] . "</p></a></div></div></div>";
+                                echo "<div class='col-lg-3 col-md-6 mb-4 mb-lg-0' style='width: 50%'>
+                                      <div class='card rounded shadow-sm border-0'>
+                                      <div class='card-body p-4'>
+                                      <a href='inpost.php?id=$carid' style='color: black; text-decoration: none;'>
+                                      <img src='../afbeeldingen/" . $row['afbeelding1'] . "' alt='' class='img-fluid d-block mx-auto mb-3' style='width: 100%;'>
+                                      <h5>" . $row['title'] . "</h5>
+                                      <p class='small text-muted font-italic'>
+                                      " . $row['info'] . "
+                                      </p>
+                                      </a>
+                                      </div>
+                                      </div>
+                                      </div>";
                             }
                             ?>
                         </div>
