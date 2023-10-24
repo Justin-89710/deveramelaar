@@ -1,7 +1,8 @@
 <?php
+// start session
 session_start();
 
-// get session info
+// get session ID
 $id = $_SESSION['id'];
 
 // connect to database
@@ -12,7 +13,7 @@ if (!$db) {
     die("Connection failed: " . $db->connect_error);
 }
 
-// show server erors
+// show server errors
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
@@ -22,44 +23,24 @@ if (!isset($_SESSION['loggedin'])) {
     header("location: ../home/home.php");
 } elseif (isset($_SESSION['loggedin'])) {
     // set session info if user is logged in
-    $sesionid = $_SESSION['id'];
-    $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
+    $result = $db->query("SELECT * FROM Login WHERE ID='$id'");
     $row = $result->fetchArray();
-    $sessionname = $row['username'];
-    $sessionemail = $row['email'];
-    $sessionprofielfoto = $row['profielfoto'];
-    $sessionbio = $row['bio'];
-    $sessionrank = $row['rank'];
+    $name = $row['username'];
+    $email = $row['email'];
+    $profielfoto = $row['profielfoto'];
+    $bio = $row['bio'];
+    $rank = $row['rank'];
 } else {
     $error = "Error";
 }
 
 // change rank into text
-if ($sessionrank == 0) {
-    $sessionrank = "Verzamelaar";
-} elseif ($sessionrank == 1) {
-    $sessionrank = "Admin";
-} elseif ($sessionrank == null) {
-    $sessionrank = "Bezoeker";
-} else {
-    $sessionrank = "Error";
-}
-
-//get info from database
-$result = $db->query("SELECT * FROM Login WHERE ID='$id'");
-$row = $result->fetchArray();
-$username = $row['username'];
-$email = $row['email'];
-$profielfoto = $row['profielfoto'];
-$bio = $row['bio'];
-$rank = $row['rank'];
-$post = $row['posts'];
-
-// change rank into text
 if ($rank == 0) {
-    $rank = "Verzamelaar";
+    $rank = "Collector";
 } elseif ($rank == 1) {
     $rank = "Admin";
+} elseif ($rank == null) {
+    $rank = "Visitor";
 } else {
     $rank = "Error";
 }
@@ -101,13 +82,13 @@ if (isset($_POST['submitprofielfoto'])) {
                 $db->exec("UPDATE Login SET profielfoto = '$fileNameNew' WHERE ID = '$id'");
                 header("Location: edit.php");
             } else {
-                $error = "Bestand is te groot.";
+                $error = "File is to big.";
             }
         } else {
-            $error = "Er is een fout opgetreden.";
+            $error = "There is an unexpected error.";
         }
     } else {
-        $error = "Dit bestandstype is niet toegestaan.";
+        $error = "This type of file is not allowed.";
     }
 }
 
@@ -117,7 +98,6 @@ if (isset($_POST['submitusername'])) {
     $username = $_POST['username'];
     // update database
     $db->exec("UPDATE Login SET username = '$username' WHERE ID = '$id'");
-    header("Location: edit.php");
 }
 
 // submit new email
@@ -126,7 +106,6 @@ if (isset($_POST['submitemail'])) {
     $email = $_POST['email'];
     // update database
     $db->exec("UPDATE Login SET email = '$email' WHERE ID = '$id'");
-    header("Location: edit.php");
 }
 
 // submit new bio
@@ -135,12 +114,16 @@ if (isset($_POST['submitbio'])) {
     $bio = $_POST['bio'];
     // update database
     $db->exec("UPDATE Login SET bio = '$bio' WHERE ID = '$id'");
-    header("Location: edit.php");
 }
+//set search result to null
 $searchresult = null;
+// search for user
 if (isset($_POST['searchbutton'])) {
+    // get search input
     $search = $_POST['searchinput'];
+    // search for user in Database
     $searchquery = "SELECT * FROM Login WHERE username LIKE '%$search%'";
+    // set search result
     $searchresult = $db->query($searchquery);
 }
 ?>
@@ -152,51 +135,15 @@ if (isset($_POST['searchbutton'])) {
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Edit <?php echo $username?>'s Profile</title>
+    <title>Edit <?php echo $name?>'s Profile</title>
+    <!-- web icon -->
     <link rel="icon" href="../afbeeldingen/logo.png">
+    <!-- nav css -->
     <link rel="stylesheet" href="../nav/nav.css">
+    <!-- custom css for page -->
+    <link rel="stylesheet" href="edit.css">
+    <!-- bootstrap css -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <style>
-        .img-account-profile {
-            height: 10rem;
-        }
-        .rounded-circle {
-            border-radius: 50% !important;
-        }
-        .card {
-            box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
-        }
-        .card .card-header {
-            font-weight: 500;
-        }
-        .card-header:first-child {
-            border-radius: 0.35rem 0.35rem 0 0;
-        }
-        .card-header {
-            padding: 1rem 1.35rem;
-            margin-bottom: 0;
-            background-color: #1f2029;
-            border-bottom: 1px solid rgba(33, 40, 50, 0.125);
-            color: white;
-        }
-        .form-control2, .dataTable-input {
-            display: block;
-            width: 100%;
-            padding: 0.875rem 1.125rem;
-            font-size: 0.875rem;
-            font-weight: 400;
-            line-height: 1;
-            color: #69707a;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid #c5ccd6;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            border-radius: 0.35rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-    </style>
 </head>
 <body>
 <section class="h-100" style="min-height: 100vh;">
@@ -205,8 +152,9 @@ if (isset($_POST['searchbutton'])) {
             <a class="navbar-brand" href="../home/home.php">
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler first-button" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <div class="animated-icon1"><span></span><span></span><span></span></div>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -249,13 +197,13 @@ if (isset($_POST['searchbutton'])) {
                 if (isset($_SESSION['loggedin'])) {
                     echo "<div class='dropdown'>
                           <button class='btn btn-outline-light dropdown-toggle' type='button' id='dropdownMenuButton1' data-bs-toggle='dropdown' aria-expanded='false'>
-                          $sessionname
+                          $name
                           </button>
                             <ul class='dropdown-menu' aria-labelledby='dropdownMenuButton1'>
                                 <li><a class='dropdown-item' href='../acount/acount.php'>Profile</a></li>
                                 <li><a class='dropdown-item' href='../Post/Post.php'>Post</a></li>
                                 <li><a class='dropdown-item' href='../acount/logout.php'>Logout</a></li>
-                                ";if ($sessionrank == "Admin") {
+                                ";if ($rank == "Admin") {
                         echo "<li><a class='dropdown-item' href='../acount/Admin.php'>Admin</a></li>";
                     }"
                             </ul>
@@ -298,7 +246,7 @@ if (isset($_POST['searchbutton'])) {
                             <label class="small mb-1" for="inputUsername">Username</label>
                             <input name="username" class="form-control2" id="inputUsername" type="text" placeholder="Enter your username">
                             <!-- show username -->
-                            <p class="small mb-1">Your username is: <?php echo $username?></p>
+                            <p class="small mb-1">Your username is: <?php echo $name?></p>
                             <?php
                             // show when username is changed
                             if (isset($error)) {
@@ -359,8 +307,11 @@ if (isset($_POST['searchbutton'])) {
     </div>
 </div>
 </section>
-
+<!-- bootstrap js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<!-- font awesome js -->
 <script src="https://kit.fontawesome.com/2a8f5c1a81.js" crossorigin="anonymous"></script>
+<!-- nav script -->
+<script src="../nav/nav.js"></script>
 </body>
 </html>

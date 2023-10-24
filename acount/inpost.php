@@ -2,6 +2,9 @@
 // start session
 session_start();
 
+// get id from session
+$sesionid = $_SESSION['id'];
+
 // connect to database
 $db = new SQLite3('../database/database.db');
 
@@ -10,42 +13,41 @@ if (!$db) {
     die("Connection failed: " . $db->connect_error);
 }
 
-// show server erors
+// show server errors
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 // check if user is logged in
 if (!isset($_SESSION['loggedin'])) {
     // set user info if user is not logged in
-    $sessionname = "Bezoeker";
-    $sessionemail = null;
-    $sessionprofielfoto = "default.png";
-    $sessionbio = "Ik ben een bezoeker!";
-    $sessionrank = null;
-    $sesionid = null;
+    $name = "Visitor";
+    $email = null;
+    $profielfoto = "default.png";
+    $bio = "I am a visitor!";
+    $rank = null;
+    $id = null;
 } elseif (isset($_SESSION['loggedin'])) {
     // set user info if user is logged in
-    $sesionid = $_SESSION['id'];
     $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
     $row = $result->fetchArray();
-    $sessionname = $row['username'];
-    $sessionemail = $row['email'];
-    $sessionprofielfoto = $row['profielfoto'];
-    $sessionbio = $row['bio'];
-    $sessionrank = $row['rank'];
+    $name = $row['username'];
+    $email = $row['email'];
+    $profielfoto = $row['profielfoto'];
+    $bio = $row['bio'];
+    $rank = $row['rank'];
 } else {
     $error = "Error";
 }
 
 // change rank into text
-if ($sessionrank == 0) {
-    $sessionrank = "User";
-} elseif ($sessionrank == 1) {
-    $sessionrank = "Admin";
-} elseif ($sessionrank == null) {
-    $sessionrank = "Bezoeker";
+if ($rank == 0) {
+    $rank = "Collector";
+} elseif ($rank == 1) {
+    $rank = "Admin";
+} elseif ($rank == null) {
+    $rank = "Visitor";
 } else {
-    $sessionrank = "Error";
+    $rank = "Error";
 }
 
 // get id from url
@@ -116,15 +118,13 @@ if (isset($_POST['searchbutton'])) {
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo $title ?> By <?php echo $username?></title>
+    <!-- nav css -->
     <link rel="stylesheet" href="../nav/nav.css">
-    <style>
-        .custom-enlarged-image {
-            width: 100%; /* Expand to 100% width */
-            height: auto; /* Maintain aspect ratio */
-            max-height: none; /* Remove max height */
-        }
-    </style>
+    <!-- custom css for page -->
+    <link rel="stylesheet" href="inpost.css">
+    <!-- web icon -->
     <link rel="icon" href="../afbeeldingen/logo.png">
+    <!-- bootstrap css -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
@@ -134,8 +134,9 @@ if (isset($_POST['searchbutton'])) {
             <a class="navbar-brand" href="../home/home.php">
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler first-button" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <div class="animated-icon1"><span></span><span></span><span></span></div>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -178,13 +179,13 @@ if (isset($_POST['searchbutton'])) {
                 if (isset($_SESSION['loggedin'])) {
                     echo "<div class='dropdown'>
                           <button class='btn btn-outline-light dropdown-toggle' type='button' id='dropdownMenuButton1' data-bs-toggle='dropdown' aria-expanded='false'>
-                          $sessionname
+                          $name
                           </button>
                             <ul class='dropdown-menu' aria-labelledby='dropdownMenuButton1'>
                                 <li><a class='dropdown-item' href='../acount/acount.php'>Profile</a></li>
                                 <li><a class='dropdown-item' href='../Post/Post.php'>Post</a></li>
                                 <li><a class='dropdown-item' href='../acount/logout.php'>Logout</a></li>
-                                ";if ($sessionrank == "Admin") {
+                                ";if ($rank == "Admin") {
                         echo "<li><a class='dropdown-item' href='../acount/Admin.php'>Admin</a></li>";
                     }"
                             </ul>
@@ -331,5 +332,7 @@ if (isset($_POST['searchbutton'])) {
         $('#imageSlider').carousel();
     });
 </script>
+<!-- nav script -->
+<script src="../nav/nav.js"></script>
 </body>
 </html>

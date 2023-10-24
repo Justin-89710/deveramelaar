@@ -14,17 +14,8 @@ if (!$db) {
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-// check for admin rank
-if ($_SESSION['rank'] != 1) {
-    header("Location: ../home/home.php");
-}
-
-// get id from url
+// set besteld to 1 in Post
 $id = $_GET['id'];
-
-// delete user
-$db->exec("DELETE FROM Login WHERE ID='$id'");
-
-// redirect to admin page
-header("Location: Admin.php");
+$db->exec("UPDATE Posts SET besteld='1' WHERE ID='$id'");
+header("Location: ../home/home.php");
 ?>

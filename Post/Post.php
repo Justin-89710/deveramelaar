@@ -10,7 +10,7 @@ if (!$db) {
     die("Connection failed: " . $db->connect_error);
 }
 
-// error handeling
+// error handling
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
@@ -34,11 +34,11 @@ if (!isset($_SESSION['loggedin'])) {
 
 // change rank into text
 if ($sessionrank == 0) {
-    $sessionrank = "Verzamelaar";
+    $sessionrank = "Collector";
 } elseif ($sessionrank == 1) {
     $sessionrank = "Admin";
 } elseif ($sessionrank == null) {
-    $sessionrank = "Bezoeker";
+    $sessionrank = "Visitor";
 } else {
     $sessionrank = "Error";
 }
@@ -169,9 +169,11 @@ if (isset($_POST['searchbutton'])) {
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Post</title>
+    <!-- Web icon -->
     <link rel="icon" href="../afbeeldingen/logo.png">
-    <!-- bootstrap css -->
+    <!-- Nav CSS -->
     <link rel="stylesheet" href="../nav/nav.css">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
@@ -181,9 +183,10 @@ if (isset($_POST['searchbutton'])) {
             <a class="navbar-brand" href="../home/home.php">
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <button class="navbar-toggler first-button" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <div class="animated-icon1"><span></span><span></span><span></span></div>
+                </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -253,26 +256,26 @@ if (isset($_POST['searchbutton'])) {
                             <input type="text" class="form-control" id="your-name" name="title" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="your-email" class="form-label">Merk</label>
+                            <label for="your-email" class="form-label">Brand</label>
                             <input type="text" class="form-control" id="your-email" name="merk" style="background: transparent;" required>
                         </div>
                         <div class="col-12">
-                            <label for="your-message" class="form-label">Info over auto</label>
+                            <label for="your-message" class="form-label">Some things you want to say about it!</label>
                             <textarea class="form-control" id="your-message" name="content" rows="5" style="background: transparent;" required></textarea>
                         </div>
                         <div class="col-12">
                             <label for="your-picture" class="form-label">Category</label>
                             <select class="form-select" aria-label="Default select example" name="category" style="background: transparent; color: black;">
                                 <option selected>Open this select menu</option>
-                                <option value="1">oldtimer</option>
-                                <option value="2">sportcar</option>
+                                <option value="1">Old-timer</option>
+                                <option value="2">sport car</option>
                                 <option value="3">SUV</option>
                                 <option value="4">Supercar</option>
-                                <option value="5">Hypercar</option>
-                                <option value="6">musel car</option>
+                                <option value="5">Hyper car</option>
+                                <option value="6">mussel car</option>
                                 <option value="7">tuner car</option>
-                                <option value="8">truks</option>
-                                <option value="9">Anders</option>
+                                <option value="8">trucks</option>
+                                <option value="9">Other</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -280,39 +283,39 @@ if (isset($_POST['searchbutton'])) {
                             <input type="text" class="form-control" id="your-email" name="model" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="your-email" class="form-label">Bouwjaar</label>
+                            <label for="your-email" class="form-label">Year it was build</label>
                             <input type="text" class="form-control" id="your-email" name="bouwjaar" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="your-email" class="form-label">Km stand</label>
+                            <label for="your-email" class="form-label">Amount of KM</label>
                             <input type="text" class="form-control" id="your-email" name="kmstand" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="your-email" class="form-label">Kleur</label>
+                            <label for="your-email" class="form-label">Color</label>
                             <input type="text" class="form-control" id="your-email" name="kleur" style="background: transparent;" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="your-email" class="form-label">Vermogen</label>
+                            <label for="your-email" class="form-label">Horse Power</label>
                             <input type="text" class="form-control" id="your-email" name="vermogen" style="background: transparent;" required>
                         </div>
                         <div class="col-12">
-                            <label for="your-picture" class="form-label">Afbeelding 1</label>
+                            <label for="your-picture" class="form-label">Image 1</label>
                             <input type="file" class="form-control" id="your-picture" name="afbeelding1" style="background: transparent; color: white;" required>
                         </div>
                         <div class="col-12">
-                            <label for="your-picture" class="form-label">Afbeelding 2 (optional)</label>
+                            <label for="your-picture" class="form-label">Image 2 (optional)</label>
                             <input type="file" class="form-control" id="your-picture" name="afbeelding2" style="background: transparent; color: white;">
                         </div>
                         <div class="col-12">
-                            <label for="your-picture" class="form-label">Afbeelding 3 (optional)</label>
+                            <label for="your-picture" class="form-label">Image 3 (optional)</label>
                             <input type="file" class="form-control" id="your-picture" name="afbeelding3" style="background: transparent; color: white;">
                         </div>
                         <div class="col-12">
-                            <label for="your-picture" class="form-label">Afbeelding 4 (optional)</label>
+                            <label for="your-picture" class="form-label">Image 4 (optional)</label>
                             <input type="file" class="form-control" id="your-picture" name="afbeelding4" style="background: transparent; color: white;">
                         </div>
                         <div class="col-12">
-                            <label for="your-picture" class="form-label">Afbeelding 5 (optional)</label>
+                            <label for="your-picture" class="form-label">Image 5 (optional)</label>
                             <input type="file" class="form-control" id="your-picture" name="afbeelding5" style="background: transparent; color: white;">
                         </div>
                         <div class="col-12">
@@ -330,5 +333,7 @@ if (isset($_POST['searchbutton'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <!-- font awesome -->
 <script src="https://kit.fontawesome.com/2a8f5c1a81.js" crossorigin="anonymous"></script>
+<!-- nav script -->
+<script src="../nav/nav.js"></script>
 </body>
 </html>

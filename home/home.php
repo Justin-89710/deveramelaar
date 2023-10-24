@@ -1,4 +1,5 @@
 <?php
+// start session
 session_start();
 
 // connect to database
@@ -9,15 +10,15 @@ if (!$db) {
     die("Connection failed: " . $db->connect_error);
 }
 
-// show server erors
+// show server errors
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 if (!isset($_SESSION['loggedin'])) {
-    $sessionname = "Bezoeker";
+    $sessionname = "Visitor";
     $sessionemail = null;
     $sessionprofielfoto = "default.png";
-    $sessionbio = "Ik ben een bezoeker!";
+    $sessionbio = "I am a visitor!";
     $sessionrank = null;
 } elseif (isset($_SESSION['loggedin'])) {
     $sesionid = $_SESSION['id'];
@@ -32,7 +33,7 @@ if (!isset($_SESSION['loggedin'])) {
     $error = "Error";
 }
 
-// ceck if user is logged in
+// check if user is logged in
 if (!isset($_SESSION['loggedin'])) {
     $sessionrank = null;
 } else {
@@ -41,11 +42,11 @@ if (!isset($_SESSION['loggedin'])) {
 
 // change rank into text
 if ($sessionrank == 0) {
-    $sessionrank = "Verzamelaar";
+    $sessionrank = "Collector";
 } elseif ($sessionrank == 1) {
     $sessionrank = "Admin";
 } elseif ($sessionrank == null) {
-    $sessionrank = "Bezoeker";
+    $sessionrank = "Visitor";
 } else {
     $sessionrank = "Error";
 }
@@ -57,14 +58,14 @@ if (isset($_POST['searchbutton'])) {
     $searchresult = $db->query($searchquery);
 }
 
-// get al Posts
+// get all Posts
 $result = $db->query("SELECT * FROM Posts");
 // count how many posts there are
 $numberofposts = 0;
 while ($row = $result->fetchArray()) {
     $numberofposts++;
 }
-// randamize a number
+// randomize a number
 $randomnumber = rand(1, $numberofposts);
 // get the post with the random number
 $result = $db->query("SELECT * FROM Posts WHERE ID='$randomnumber'");
@@ -88,8 +89,11 @@ $mainpostusername = $row['username'];
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Home</title>
+    <!-- Nav CSS -->
     <link rel="stylesheet" href="../nav/nav.css">
+    <!-- Web icon -->
     <link rel="icon" href="../afbeeldingen/logo.png">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
@@ -99,8 +103,9 @@ $mainpostusername = $row['username'];
             <a class="navbar-brand" href="../home/home.php">
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler first-button" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <div class="animated-icon1"><span></span><span></span><span></span></div>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -342,5 +347,7 @@ $mainpostusername = $row['username'];
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <!-- font awesome -->
 <script src="https://kit.fontawesome.com/2a8f5c1a81.js" crossorigin="anonymous"></script>
+<!-- nav script -->
+<script src="../nav/nav.js"></script>
 </body>
 </html>

@@ -23,7 +23,7 @@ if ($_SESSION['rank'] != 1) {
 $id = $_GET['id'];
 
 // delete user
-$db->exec("DELETE FROM Login WHERE ID='$id'");
+$db->exec("DELETE FROM Posts WHERE ID='$id'");
 
 // redirect to admin page
 header("Location: Admin.php");

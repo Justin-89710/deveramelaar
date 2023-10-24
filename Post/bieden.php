@@ -5,25 +5,25 @@ session_start();
 // connect to database
 $db = new SQLite3('../database/database.db');
 
-// check if connection is made
+// check if connection is successful
 if (!$db) {
     die("Connection failed: " . $db->connect_error);
 }
 
-// show server side errors
+// show server errors
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 // check if user is logged in
 if (!isset($_SESSION['loggedin'])) {
-    // if user isn't logged in set these variables
+    // set user variables if user is not logged in
     $sessionname = "Visitor";
     $sessionemail = null;
     $sessionprofielfoto = "default.png";
     $sessionbio = "I am a visitor!";
     $sessionrank = null;
 } elseif (isset($_SESSION['loggedin'])) {
-    // if user is logged in set these variables
+    // set user variables if user is logged in
     $sesionid = $_SESSION['id'];
     $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
     $row = $result->fetchArray();
@@ -47,58 +47,33 @@ if ($sessionrank == 0) {
     $sessionrank = "Error";
 }
 
-// search
+// get id from url
+$id = $_GET['id'];
+
+//search
 $searchresult = null;
 if (isset($_POST['searchbutton'])) {
     $search = $_POST['searchinput'];
     $searchquery = "SELECT * FROM Login WHERE username LIKE '%$search%'";
     $searchresult = $db->query($searchquery);
 }
-
-// get id from url
-$id = $_GET['id'];
-
-// change id into text
-if ($id == 1) {
-    $id = "Oldtimers";
-} elseif ($id == 2) {
-    $id = "Sports Car";
-} elseif ($id == 3) {
-    $id = "SUV";
-} elseif ($id == 4) {
-    $id = "Super Car";
-} elseif ($id == 5) {
-    $id = "Hyper Car";
-} elseif ($id == 6) {
-    $id = "Muscle car";
-} elseif ($id == 7) {
-    $id = "Tuner Car";
-} elseif ($id == 8) {
-    $id = "Trucks";
-} elseif ($id == 9) {
-    $id = "Other";
-} else {
-    $id = "Error";
-}
 ?>
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="gradient-custom-2">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Category <?php echo $id ?></title>
-    <!-- Web icon -->
+    <title>Bieden</title>
     <link rel="icon" href="../afbeeldingen/logo.png">
-    <!-- Nav CSS -->
+    <!-- bootstrap css -->
     <link rel="stylesheet" href="../nav/nav.css">
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
-<section class="h-100" style="min-height: 100vh;">
+<section class="h-100 gradient-custom-2" style="min-height: 100vh;">
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(145,145,145,0.5);">
         <div class="container-fluid">
             <a class="navbar-brand" href="../home/home.php">
@@ -165,87 +140,67 @@ if ($id == 1) {
             </div>
         </div>
     </nav>
-    <!-- show category -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 style="text-align: center; margin-top: 5em;">Category: <?php echo $id ?></h1>
-            </div>
-            <!-- dropdown for other category's -->
-            <div class="col-md-12">
-                <div class="dropdown" style="text-align: center; margin-top: 2em;">
-                    <button class="btn btn-outline-dark dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                        Other Category's
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="category.php?id=1">Oldtimers</a></li>
-                        <li><a class="dropdown-item" href="category.php?id=2">Sports Car</a></li>
-                        <li><a class="dropdown-item" href="category.php?id=3">SUV</a></li>
-                        <li><a class="dropdown-item" href="category.php?id=4">Super Car</a></li>
-                        <li><a class="dropdown-item" href="category.php?id=5">Hyper Car</a></li>
-                        <li><a class="dropdown-item" href="category.php?id=6">Muscle Car</a></li>
-                        <li><a class="dropdown-item" href="category.php?id=7">Tuner Car</a></li>
-                        <li><a class="dropdown-item" href="category.php?id=8">Trucks</a></li>
-                        <li><a class="dropdown-item" href="category.php?id=9">Other</a></li>
-                    </ul>
-                </div>
-        </div>
-    </div>
-    <?php
-    // Get id from URL
-    $newid = $_GET['id'];
-
-    $result = $db->query("SELECT * FROM Posts WHERE category= '$newid'");
-    $row = $result->fetchArray();
-    // Check if there are any records in the result set
-    if ($row) {
-        ?>
-        <!-- spacer of 50px -->
-        <div style="height: 100px; width: 100%"></div>
-        <div class="container">
-            <div class="row">
+    <div class="container my-5" style="background-color: rgba(145,145,145,0.5); padding: 3em; border-radius: 1em; box-shadow: #69707a; color: black;">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
                 <?php
-                $result = $db->query("SELECT * FROM Posts WHERE category= '$newid'");
-                while ($row2 = $result->fetchArray()) {
-                    $afbeelding1 = $row2['afbeelding1'];
-                    $title = $row2['title'];
-                    $info = $row2['info'];
-                    $userID = $row2['userID'];
-                    $postID = $row2['ID'];
+                // get id from url
+                $id = $_GET['id'];
+                // get info from the post with the id
+                $result = $db->query("SELECT * FROM Posts WHERE ID='$id'");
+                $row = $result->fetchArray();
+                $title = $row['title'];
+                $userid = $row['userID'];
 
-                    // Get username from user ID
-                    $userResult = $db->query("SELECT * FROM Login WHERE ID='$userID'");
-                    $userRow = $userResult->fetchArray();
-                    $username = $userRow['username'];
-                    ?>
-                    <div class="col-md-4">
-                        <!-- Blog post -->
-                        <div class="card mb-4">
-                            <a href="../acount/inpost.php?id=<?php echo $postID ?>"><img style="padding: 1em; border-radius: 1em;" class="card-img-top" src="../afbeeldingen/<?php echo $afbeelding1 ?>" alt="..." /></a>
-                            <div class="card-body">
-                                <div class="small text-muted"><?php echo $username ?></div>
-                                <h2 class="card-title h4"><?php echo $title ?></h2>
-                                <p class="card-text"><?php echo $info ?></p>
-                                <a class="btn btn-outline-dark" href="../acount/inpost.php?id=<?php echo $postID ?>">Read more →</a>
+                // put info form the form in db in tabel bestellingen
+                if (isset($_POST['submit'])) {
+                    $name = $_POST['name'];
+                    $price = $_POST['price'];
+                    $message = $_POST['message'];
+                    $db->exec("INSERT INTO Bestellingen (unb, price, message, postID) VALUES ('$name', '$price', '$message', '$id')");
+
+                    // get mail from userid
+                    $result = $db->query("SELECT * FROM Login WHERE ID='$userid'");
+                    $row = $result->fetchArray();
+                    $email = $row['email'];
+
+                    // send mail
+                    $to = $email;
+                    $subject = "New bid on $title";
+                    $msg = "You have a new bid on $title";
+                    $body = "From: $name\n Message: $message\n Price: $price";
+                    mail($to, $subject, $body);
+                    header("Location: ../home/home.php");
+                }
+                ?>
+                <h1 class="mb-3" style="color: white;">Bid!</h1>
+                <p class="mb-5" style="color: white;">Bid on <?php echo $title ?></p>
+                <form method="post" enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="your-name" class="form-label" style="color: white;">Your full name</label>
+                            <input type="text" class="form-control" id="your-name" name="name" style="background: transparent;" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="your-email" class="form-label" style="color: white;">Your price</label>
+                            <input type="text" class="form-control" id="your-email" name="price" style="background: transparent;" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="your-message" class="form-label" style="color: white;">Message</label>
+                            <textarea class="form-control" id="your-message" name="message" rows="5" style="background: transparent;" required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="row">
+                                <button type="submit" class="btn btn-outline-light w-100 fw-bold" style="width: 100%" name="submit">Send</button>
                             </div>
                         </div>
                     </div>
-                    <?php
-                }
-                ?>
+                </form>
             </div>
         </div>
-        <?php
-    } else {
-        echo "<h1 style='text-align: center; margin-top: 5em; color: red'>No posts found of that specific category</h1>";
-    }
-    ?>
+    </div>
 </section>
-<!-- Include jQuery and Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
+<!-- bootstrap js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <!-- font awesome -->
 <script src="https://kit.fontawesome.com/2a8f5c1a81.js" crossorigin="anonymous"></script>

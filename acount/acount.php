@@ -1,76 +1,51 @@
 <?php
-// start session
+//Start Login Session
 session_start();
 
-// get id from session
+//Get the user id from session
 $id = $_SESSION['id'];
 
-// connect to database
+//Connect to database
 $db = new SQLite3('../database/database.db');
 
-// check if connection is successful
+//Check if database connection is successful
 if (!$db) {
     die("Connection failed: " . $db->connect_error);
 }
 
-// show server erors
+//Show Errors that happen in the server
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-// check if user is logged in and set all the session variables
+//Check if user is logged in and set all the session variables
 if (!isset($_SESSION['loggedin'])) {
-    // send user to login page
+    //If user is not logged in send user to login page
     header("location: ../home/home.php");
 } elseif (isset($_SESSION['loggedin'])) {
-    //if logged in
-    $sesionid = $_SESSION['id'];
-    $result = $db->query("SELECT * FROM Login WHERE ID='$sesionid'");
+    //get info for the account page from database
+    $result = $db->query("SELECT * FROM Login WHERE ID='$id'");
     $row = $result->fetchArray();
-    $sessionname = $row['username'];
-    $sessionemail = $row['email'];
-    $sessionprofielfoto = $row['profielfoto'];
-    $sessionbio = $row['bio'];
-    $sessionrank = $row['rank'];
+    $username = $row['username'];
+    $email = $row['email'];
+    $profielfoto = $row['profielfoto'];
+    $bio = $row['bio'];
+    $rank = $row['rank'];
+    $post = $row['posts'];
 } else {
-    //if there is something wrong
-    $error = "Error";
+    //if there is something wrong show wats wrong in the variable error
+    $error = error_log();
 }
-
-// change session rank into text
-if ($sessionrank == 0) {
-    //if rank is 0
-    $sessionrank = "Verzamelaar";
-} elseif ($sessionrank == 1) {
-    //if rank is 1
-    $sessionrank = "Admin";
-} elseif ($sessionrank == null) {
-    //if rank is not set
-    $sessionrank = "Bezoeker";
-} else {
-    //if rank is none of the above
-    $sessionrank = "Error";
-}
-
-//get info for the account page from database
-$result = $db->query("SELECT * FROM Login WHERE ID='$id'");
-$row = $result->fetchArray();
-$username = $row['username'];
-$email = $row['email'];
-$profielfoto = $row['profielfoto'];
-$bio = $row['bio'];
-$rank = $row['rank'];
-$post = $row['posts'];
 
 // change rank into text
 if ($rank == 0) {
-    //if rank is 0
-    $rank = "Verzamelaar";
+    //if rank is 0 show that the user is a Collector
+    $rank = "Collector";
 } elseif ($rank == 1) {
-    //if rank is 1
+    //if rank is 1 show that the user is an Admin
     $rank = "Admin";
 } else {
-    //if rank is none of the above
-    $rank = "Error";
+    //if rank is none of the above show that the user is a Visitor
+    $rank = "Visitor";
 }
 
 // search function
@@ -89,8 +64,8 @@ if (isset($_POST['searchbutton'])) {
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title><?php echo $username?> account</title>
-    <!-- Icon for web -->
+    <title><?php echo $username?>'s Account</title>
+    <!-- Icon Logo for web -->
     <link rel="icon" href="../afbeeldingen/logo.png">
     <!-- Nav style sheet -->
     <link rel="stylesheet" href="../nav/nav.css">
@@ -107,8 +82,9 @@ if (isset($_POST['searchbutton'])) {
                 <!-- logo -->
                 <img src="../afbeeldingen/logo.png" alt="" class="logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler first-button" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <div class="animated-icon1"><span></span><span></span><span></span></div>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -128,11 +104,11 @@ if (isset($_POST['searchbutton'])) {
                 <div class="search-results" style="background-color: rgba(145,145,145,0.5);">
                     <div class="container">
                         <?php
-                        if ($searchresult !== null) {
+                        if ($searchresult !== null) { // if result is not empty
                             while ($searchrow = $searchresult->fetchArray()) {
-                                $searchname = $searchrow['username'];
-                                $searchprofilepic = $searchrow['profielfoto'];
-                                $searchid = $searchrow['ID'];
+                                $searchname = $searchrow['username']; // get name of person you are searching for
+                                $searchprofilepic = $searchrow['profielfoto']; // get profile picture of user you're searching for
+                                $searchid = $searchrow['ID']; // get id of person you're searching for
                                 ?>
                                 <div class="profile-item">
                                     <a class="hover" href="../acount/profile.php?id=<?php echo $searchid ?>" class="profile-name">
@@ -154,7 +130,7 @@ if (isset($_POST['searchbutton'])) {
                     // if user is logged in show dropdown
                     echo "<div class='dropdown'>
                           <button class='btn btn-outline-light dropdown-toggle' type='button' id='dropdownMenuButton1' data-bs-toggle='dropdown' aria-expanded='false'>
-                          $sessionname
+                          $username
                           </button>
                             <ul class='dropdown-menu' aria-labelledby='dropdownMenuButton1'>
                                 <li><a class='dropdown-item' href='../acount/acount.php'>Profile</a></li>
@@ -162,7 +138,7 @@ if (isset($_POST['searchbutton'])) {
                                 <li><a class='dropdown-item' href='../acount/logout.php'>Logout</a></li>
                                 ";
                     // if rank is admin show admin button
-                    if ($sessionrank == "Admin") {
+                    if ($rank == "Admin") {
                         echo "<li><a class='dropdown-item' href='../acount/Admin.php'>Admin</a></li>";
                     }"
                             </ul>
@@ -248,7 +224,11 @@ if (isset($_POST['searchbutton'])) {
         </div>
     </div>
 </section>
+<!-- bootstrap script -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<!-- fonts script -->
 <script src="https://kit.fontawesome.com/2a8f5c1a81.js" crossorigin="anonymous"></script>
+<!-- nav script -->
+<script src="../nav/nav.js"></script>
 </body>
 </html>

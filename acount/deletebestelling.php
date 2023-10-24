@@ -19,11 +19,11 @@ if ($_SESSION['rank'] != 1) {
     header("Location: ../home/home.php");
 }
 
-// get id from url
+// get id form url
 $id = $_GET['id'];
 
-// delete user
-$db->exec("DELETE FROM Login WHERE ID='$id'");
+// delete bestelling
+$db->exec("DELETE FROM Bestellingen WHERE ID='$id'");
 
 // redirect to admin page
 header("Location: Admin.php");
